@@ -27,9 +27,11 @@
     "babel": "^5.8.23",
     "babel-core": "^5.8.25",
     "babelify": "^6.3.0",
+    "browser-sync": "^2.9.6",
     "browserify": "^11.2.0",
     "gulp": "^3.9.0",
     "react": "^0.13.3",
-    "vinyl-source-stream": "^1.1.0"
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.4.0"
   }
 }
