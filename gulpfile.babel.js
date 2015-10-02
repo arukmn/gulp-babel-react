@@ -48,7 +48,7 @@ gulp.task('browser-sync', () => {
 		}
 	})
 
-	gulp.watch("src/js/bundle.js", () => {
+	gulp.watch("./src/js/bundle.js", () => {
 		browserSync.reload();
 	});
 });
