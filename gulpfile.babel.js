@@ -5,34 +5,19 @@ import source from 'vinyl-source-stream';
 import watchify from 'watchify';
 import browserSync from 'browser-sync';
 
-gulp.task('default', () => {
-	console.log("default log");
-});
-
-let watching = false;
-gulp.task('enable-watch', () => {
-	watching = true;
-	compile(watching);
-});
-
-gulp.task('disable-watch', () => {
-	watching = false;
-	compile(watching);
-});
-
 
 let compile = (isWatch) => {
-	let bundler = watchify(browserify('./src/app.jsx', { debug: true }).transform(babelify));
+	let bundler = browserify('./src/js/app.js', { debug: true }).transform(babelify);
 
 	if (isWatch) {
-//	  bundler = watchify(browserify('./src/app.jsx', { debug: true }).transform(babelify));
+	  bundler = watchify(bundler);
 		bundler.on('update', () => {
 			console.log('-> partical bundling.');
 			rebundle();
 		});
-	} else {
-//	  bundler = browserify('./src/app.jsx', { debug: true }).transform(babelify);
 	}
+
+	rebundle();
 
 	function rebundle() {
 		bundler
@@ -41,31 +26,39 @@ let compile = (isWatch) => {
 			console.log("Error: " + err.message);
 		})
 		.pipe(source('bundle.js'))
-		.pipe(gulp.dest('./built'))
+		.pipe(gulp.dest('./src/js'))
 	}
-
-	rebundle();
 };
 
 gulp.task('browserify', () => {
-	browserify('./src/app.jsx', { debug: true }).transform(babelify)
+	browserify('./src/js/app.js', { debug: true }).transform(babelify)
 	.bundle()
 	.on('error', (err) => {
-		console.log("Error: " + err.message);
+		console.log("Bundle Error: " + err.message);
 	})
 	.pipe(source('bundle.js'))
-	.pipe(gulp.dest('./built'))
-	.pipe(browserSync.reload())
+	.pipe(gulp.dest('./src/js'))
 });
 
-//gulp.task('browser-sync', () => {
-//	browserSync({
-//		server:
-//			baseDir: "./src"
-//	});
-//});
 
-gulp.task('watch', ['enable-watch']);
-gulp.task('unwatch', ['disable-watch']);
+gulp.task('browser-sync', () => {
+	browserSync({
+		server: {
+			baseDir: "src"
+		}
+	})
 
-gulp.task('default', ['browserify']);
+	gulp.watch("src/js/bundle.js", () => {
+		browserSync.reload();
+	});
+});
+
+gulp.task('watch', () => {
+	compile(true);
+});
+
+gulp.task('build', () => {
+	compile(false);
+});
+
+gulp.task('default', ['browser-sync', 'watch']);
